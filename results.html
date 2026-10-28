@@ -45,7 +45,7 @@
 <main class="wrap">
   <header class="hero">
     <h1>نتائج الاستبيان</h1>
-    <p>ملخصات أبو عماد – الردود والإحصائيات</p>
+    <p>الحقوق – المستوى الأول · الردود والإحصائيات</p>
   </header>
 
   <section class="section" id="loginBox">
@@ -63,7 +63,7 @@
       <button class="btn ghost" id="logout" type="button">خروج</button>
       <span class="updated" id="updated"></span>
     </div>
-    <div class="filters" id="filters" role="group" aria-label="تصفية حسب التخصص"></div>
+    <div class="filters" id="filters" role="group" aria-label="تصفية حسب المادة"></div>
     <div class="tiles" id="tiles"></div>
     <div id="charts" style="display:flex;flex-direction:column;gap:18px"></div>
   </div>
@@ -73,7 +73,7 @@
 <script>
 (function () {
   var URL_ = window.SURVEY_CONFIG.SCRIPT_URL;
-  var COLLEGE = window.SURVEY_COLUMNS.find(function (c) { return c.key === "college"; });
+  var FILTER = window.SURVEY_COLUMNS.find(function (c) { return c.q.filter; });
   var allRows = [];
   var filter = "الكل";
 
@@ -156,7 +156,8 @@
   function renderFilters() {
     var f = document.getElementById("filters");
     f.textContent = "";
-    ["الكل"].concat(COLLEGE.q.options).forEach(function (o) {
+    if (!FILTER) { f.hidden = true; return; }
+    ["الكل"].concat(FILTER.q.options).forEach(function (o) {
       var b = el("button", null, o);
       b.type = "button";
       b.setAttribute("aria-pressed", String(o === filter));
@@ -167,7 +168,7 @@
 
   function render() {
     renderFilters();
-    var rows = filter === "الكل" ? allRows : allRows.filter(function (r) { return r[COLLEGE.label] === filter; });
+    var rows = filter === "الكل" || !FILTER ? allRows : allRows.filter(function (r) { return String(r[FILTER.label] || "").split("، ").indexOf(filter) !== -1; });
     var total = rows.length;
 
     // البطاقات العلوية
@@ -197,7 +198,7 @@
     charts.textContent = "";
     if (!total) {
       var c0 = card("لا توجد ردود");
-      c0.body.appendChild(el("p", "empty", "ما وصل أي رد بعد" + (filter === "الكل" ? "." : " لهذا التخصص.") + " انشر رابط الاستبيان وارجع هنا."));
+      c0.body.appendChild(el("p", "empty", "ما وصل أي رد بعد" + (filter === "الكل" ? "." : " لهذه المادة.") + " انشر رابط الاستبيان وارجع هنا."));
       charts.appendChild(c0.root);
       return;
     }
