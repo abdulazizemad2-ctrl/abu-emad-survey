@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>رأيك يهمنا – ملخصات أبو عماد</title>
+<meta name="description" content="استبيان قصير لتقييم ملخصات أبو عماد واقتراحاتك للفصول القادمة">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">
+    <div>
+      <div class="brand-name">ملخصات أبو عماد</div>
+      <div class="brand-tag">ملخصاتنا ... تخدمك</div>
+    </div>
+    <svg width="54" height="52" viewBox="0 0 76 72" aria-hidden="true">
+      <rect x="6" y="6" width="14" height="56" rx="2" fill="#6b6b78"></rect>
+      <rect x="27" y="4" width="14" height="58" rx="2" fill="#3a3a46" transform="rotate(-10 34 33)"></rect>
+      <rect x="48" y="6" width="14" height="56" rx="2" fill="#2f4f4a"></rect>
+      <rect x="2" y="64" width="72" height="5" rx="2" fill="#6b6b78"></rect>
+    </svg>
+  </div>
+
+  <header class="hero">
+    <h1>رأيك يهمنا</h1>
+    <p>شكرًا لثقتك فينا 🤍 الاستبيان ياخذ أقل من دقيقتين، ويساعدنا نطوّر الملخصات للفصول القادمة.</p>
+  </header>
+
+  <form id="survey" novalidate>
+    <div id="sections" style="display:flex;flex-direction:column;gap:18px"></div>
+    <div id="formError" class="notice error" hidden style="margin-top:18px"></div>
+    <div style="margin-top:18px">
+      <button type="submit" class="btn" id="submitBtn">إرسال الاستبيان</button>
+    </div>
+  </form>
+
+  <section id="thanks" class="section done" hidden>
+    <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--green)"></circle><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="var(--surface)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <h2>وصلنا ردك، شكرًا لك!</h2>
+    <p>رأيك راح يساعدنا نقدّم لك ملخصات أفضل. بالتوفيق في بقية الفصل 📚</p>
+  </section>
+
+  <p class="footer">للتواصل: <span dir="ltr">@swekt_azoz</span></p>
+</main>
+
+<script src="questions.js"></script>
+<script>
+(function () {
+  var form = document.getElementById("survey");
+  var host = document.getElementById("sections");
+  var errBox = document.getElementById("formError");
+  var btn = document.getElementById("submitBtn");
+
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderQuestion(q, n) {
+    var box = el("div", { "class": "q", "data-qid": q.id });
+    var label = el("span", { "class": "q-label", id: "lbl-" + q.id }, n + ". " + q.label);
+    if (q.required) label.appendChild(el("span", { "class": "req", "aria-hidden": "true" }, "*"));
+    box.appendChild(label);
+
+    if (q.type === "radio" || q.type === "checkbox") {
+      var opts = el("div", { "class": "opts", role: q.type === "radio" ? "radiogroup" : "group", "aria-labelledby": "lbl-" + q.id });
+      q.options.forEach(function (o, i) {
+        var l = el("label", { "class": "opt" });
+        var inp = el("input", { type: q.type, name: q.id, value: o, id: q.id + "-" + i });
+        l.appendChild(inp); l.appendChild(el("span", null, o));
+        opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else if (q.type === "scale") {
+      var sc = el("div", { "class": "scale", role: "radiogroup", "aria-labelledby": "lbl-" + q.id });
+      for (var v = q.min; v <= q.max; v++) {
+        var l2 = el("label");
+        var inp2 = el("input", { type: "radio", name: q.id, value: String(v), id: q.id + "-" + v, "aria-label": String(v) });
+        l2.appendChild(inp2); l2.appendChild(el("span", null, String(v)));
+        sc.appendChild(l2);
+      }
+      box.appendChild(sc);
+      var ends = el("div", { "class": "scale-ends" });
+      ends.appendChild(el("span", null, q.min + " = " + q.minLabel));
+      ends.appendChild(el("span", null, q.max + " = " + q.maxLabel));
+      box.appendChild(ends);
+    } else if (q.type === "grid") {
+      q.rows.forEach(function (r) {
+        var row = el("div", { "class": "grid-row" });
+        row.appendChild(el("div", { "class": "grid-row-label", id: "lbl-" + r.id }, r.label));
+        var chips = el("div", { "class": "chips", role: "radiogroup", "aria-labelledby": "lbl-" + r.id });
+        q.options.forEach(function (o, i) {
+          var l3 = el("label");
+          l3.appendChild(el("input", { type: "radio", name: r.id, value: o, id: r.id + "-" + i }));
+          l3.appendChild(el("span", null, o));
+          chips.appendChild(l3);
+        });
+        row.appendChild(chips);
+        box.appendChild(row);
+      });
+    } else if (q.type === "text") {
+      box.appendChild(el("input", { type: "text", name: q.id, id: q.id, "aria-labelledby": "lbl-" + q.id, maxlength: "300" }));
+    } else if (q.type === "textarea") {
+      box.appendChild(el("textarea", { name: q.id, id: q.id, "aria-labelledby": "lbl-" + q.id, maxlength: "1500" }));
+    }
+    box.appendChild(el("div", { "class": "q-error" }, "هذا السؤال مطلوب"));
+    return box;
+  }
+
+  var n = 0;
+  window.SURVEY.forEach(function (s) {
+    var sec = el("section", { "class": "section" });
+    sec.appendChild(el("div", { "class": "section-head" }, s.title));
+    var body = el("div", { "class": "section-body" });
+    s.questions.forEach(function (q) { n++; body.appendChild(renderQuestion(q, n)); });
+    sec.appendChild(body);
+    host.appendChild(sec);
+  });
+
+  function valueOf(name, type) {
+    if (type === "checkbox") {
+      return Array.prototype.map.call(form.querySelectorAll('input[name="' + name + '"]:checked'), function (i) { return i.value; }).join("، ");
+    }
+    if (type === "text" || type === "textarea") {
+      var f = form.elements[name];
+      return f ? f.value.trim() : "";
+    }
+    var c = form.querySelector('input[name="' + name + '"]:checked');
+    return c ? c.value : "";
+  }
+
+  form.addEventListener("change", function (e) {
+    var q = e.target.closest(".q");
+    if (q) q.classList.remove("invalid");
+    errBox.hidden = true;
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    errBox.hidden = true;
+    var answers = [];
+    var firstBad = null;
+    window.SURVEY_COLUMNS.forEach(function (c) {
+      var t = c.row ? "radio" : c.q.type;
+      answers.push([c.label, valueOf(c.key, t)]);
+    });
+    window.SURVEY.forEach(function (s) {
+      s.questions.forEach(function (q) {
+        if (!q.required) return;
+        var box = form.querySelector('[data-qid="' + q.id + '"]');
+        if (!valueOf(q.id, q.type)) { box.classList.add("invalid"); if (!firstBad) firstBad = box; }
+      });
+    });
+    if (firstBad) {
+      errBox.textContent = "فيه أسئلة مطلوبة ما تمت الإجابة عليها. راجع الأسئلة المعلّمة بالأحمر.";
+      errBox.hidden = false;
+      firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    var url = window.SURVEY_CONFIG.SCRIPT_URL;
+    if (!url || url.indexOf("http") !== 0) {
+      errBox.textContent = "الاستبيان لم يُربط بعد بجدول الردود. تواصل مع @swekt_azoz.";
+      errBox.hidden = false;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "جاري الإرسال...";
+    fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ answers: answers, ua: navigator.userAgent.slice(0, 120) })
+    }).then(function () {
+      form.hidden = true;
+      document.getElementById("thanks").hidden = false;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = "إرسال الاستبيان";
+      errBox.textContent = "ما قدرنا نرسل ردك. تأكد من اتصال الإنترنت وحاول مرة ثانية.";
+      errBox.hidden = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>
