@@ -1,7 +1,7 @@
 // ===== الإعداد =====
 // بعد نشر سكربت Google Apps Script، الصق رابط الـ Web App هنا:
 window.SURVEY_CONFIG = {
-  SCRIPT_URL: "PASTE_APPS_SCRIPT_URL_HERE"
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwbtU8PqdEi5kj_DYAHM2rnGzh48GlVOUmX61mXx6OBJrAzBHA0jd5yDz0RKlOqBd-s/exec"
 };
 
 // ===== أسئلة الاستبيان =====
