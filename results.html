@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 <style>
   .wrap { max-width: 920px; }
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
@@ -69,7 +69,7 @@
   </div>
 </main>
 
-<script src="questions.js?v=4"></script>
+<script src="questions.js?v=5"></script>
 <script>
 (function () {
   var URL_ = window.SURVEY_CONFIG.SCRIPT_URL;
@@ -97,7 +97,7 @@
     var u = URL_ + "?key=" + encodeURIComponent(key);
     return fetch(u)
       .then(function (r) { return r.json(); })
-      .catch(function () { return jsonp(u); })
+      .catch(function (e1) { window.__e1 = (e1 && e1.message) || String(e1); return jsonp(u); })
       .then(function (d) {
         if (!d.ok) {
           setKey("");
@@ -114,8 +114,8 @@
         document.getElementById("updated").textContent = "آخر تحديث: " + new Date().toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" });
         render();
       })
-      .catch(function () {
-        err.textContent = "ما قدرنا نتصل بجدول الردود. تأكد من الإنترنت ومن نشر السكربت بصلاحية «Anyone».";
+      .catch(function (e2) {
+        err.textContent = "ما قدرنا نتصل بجدول الردود. (رمز الخطأ: " + (window.__e1 || "-") + " | " + ((e2 && e2.message) || String(e2)) + ")";
         err.hidden = false;
       });
   }
