@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 <style>
   .wrap { max-width: 920px; }
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
@@ -69,7 +69,7 @@
   </div>
 </main>
 
-<script src="questions.js?v=3"></script>
+<script src="questions.js?v=4"></script>
 <script>
 (function () {
   var URL_ = window.SURVEY_CONFIG.SCRIPT_URL;
@@ -94,8 +94,10 @@
       err.textContent = "لم يتم وضع رابط السكربت في ملف questions.js بعد.";
       err.hidden = false; return;
     }
-    return fetch(URL_ + "?key=" + encodeURIComponent(key))
+    var u = URL_ + "?key=" + encodeURIComponent(key);
+    return fetch(u)
       .then(function (r) { return r.json(); })
+      .catch(function () { return jsonp(u); })
       .then(function (d) {
         if (!d.ok) {
           setKey("");
@@ -116,6 +118,20 @@
         err.textContent = "ما قدرنا نتصل بجدول الردود. تأكد من الإنترنت ومن نشر السكربت بصلاحية «Anyone».";
         err.hidden = false;
       });
+  }
+
+  // بديل للاتصال عبر وسم script عند منع المتصفح لطلب fetch
+  function jsonp(u) {
+    return new Promise(function (resolve, reject) {
+      var cb = "abuEmadCb" + Date.now();
+      var sc = document.createElement("script");
+      var timer = setTimeout(function () { done(); reject(new Error("timeout")); }, 15000);
+      function done() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } sc.remove(); }
+      window[cb] = function (d) { done(); resolve(d); };
+      sc.onerror = function () { done(); reject(new Error("load")); };
+      sc.src = u + "&callback=" + cb;
+      document.body.appendChild(sc);
+    });
   }
 
   function counts(rows, label, multi) {

@@ -62,7 +62,7 @@ function doPost(e) {
 
 function doGet(e) {
   const key = e && e.parameter ? e.parameter.key : '';
-  if (key !== ADMIN_KEY) return json_({ ok: false, error: 'unauthorized' });
+  if (key !== ADMIN_KEY) return out_({ ok: false, error: 'unauthorized' }, e);
   const sh = getSheet_();
   const values = sh.getDataRange().getValues();
   const headers = values.shift() || [];
@@ -73,5 +73,15 @@ function doGet(e) {
     });
     return o;
   });
-  return json_({ ok: true, headers: headers, rows: rows });
+  return out_({ ok: true, headers: headers, rows: rows }, e);
+}
+
+// يرجّع JSON، أو JSONP إذا طلبت الصفحة callback (يتجاوز قيود المتصفح)
+function out_(obj, e) {
+  const cb = e && e.parameter ? e.parameter.callback : '';
+  if (cb && /^[A-Za-z_$][\w$]{0,60}$/.test(cb)) {
+    return ContentService.createTextOutput(cb + '(' + JSON.stringify(obj) + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return json_(obj);
 }
