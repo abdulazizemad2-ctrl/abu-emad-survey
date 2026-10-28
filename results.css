@@ -1,0 +1,29 @@
+.wrap { max-width: 920px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .tile-label { font-size: 14px; color: var(--muted); }
+  .tile-value { font-size: 30px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.3; }
+  .tile-sub { font-size: 13px; color: var(--muted); }
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; }
+  .bar-label { font-size: 15px; min-width: 0; }
+  .bar-num { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar-track { grid-column: 1 / -1; height: 12px; background: var(--navy-soft); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--navy); border-radius: 999px; }
+  .bar-fill.green { background: var(--green); }
+  .q-stats { font-size: 14px; color: var(--muted); margin: -4px 0 10px; }
+  .gtable-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: right; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .texts { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+  .texts p { margin: 0; padding: 10px 12px; background: var(--navy-soft); border-radius: 12px; font-size: 15px; overflow-wrap: anywhere; }
+  .empty { color: var(--muted); font-size: 15px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .toolbar .btn { width: auto; font-size: 15px; padding: 8px 18px; min-height: 44px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filters button { font: inherit; font-size: 15px; padding: 6px 14px; min-height: 40px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+  .filters button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--on-navy); }
+  .login { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
+  .updated { font-size: 13px; color: var(--muted); }
